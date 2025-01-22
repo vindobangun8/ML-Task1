@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 import pandas as pd
 from src.utils.helper import load_joblib, load_params
@@ -46,12 +46,8 @@ def predict(data: APIData):
     try:
         data_defense_checker(input_data=df_data, params=params)
     except AssertionError as ae:
-        return {
-            "res": "Error ",
-            "error_msg": str(ae),
-            "status_code": 400
-        }
-        
+        raise HTTPException(status_code=400, detail=f"Error Input: {str(ae)}")
+    
     # If valid, preprocess the data
     df_data = preprocess_process(data=df_data, params=params)
     
